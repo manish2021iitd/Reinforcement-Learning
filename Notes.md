@@ -102,6 +102,27 @@ enable us to see most clearly how evaluative feedback differs from, and yet can 
 * What happens when the bandit problem becomes associative, that is, when actions are taken in more than one situation?
 
 ### 2.1 An n-Armed Bandit Problem 
+*  **Learning problem:** Suppose we are faced repeatedly with a choice among n different options, or actions. After each choice we receive a numerical reward chosen from a stationary probability distribution that depends on the action we selected. Our objective is to maximize the expected total reward over some time period, for example, over 1000 action selections, or time steps.
+*  This is the original form of the **n-armed bandit problem**, so named by analogy to a **slot machine**, or **ne-armed bandit,** except that it has n levers instead of one. Each action selection is like a play of one of the slot machine’s levers, and the rewards are the payoffs for hitting the jackpot. Through repeated action selections we are to maximize our winnings by concentrating our actions on the best levers.
+*  Another analogy is that of a doctor choosing between experimental treatments for a series of seriously ill patients. Each action selection is a treatment selection, and each reward is the survival or well-being of the patient.
+*  Today the term “n-armed bandit problem” is sometimes used for a generalization of the problem described above, but we use it to refer just to this simple case.
+*  In our n-armed bandit problem, **each action has an expected or mean reward given that that action is selected**; let us call this the **value of that action**.
+*  If we knew the value of each action, then it would be trivial to solve the n-armed bandit problem: we would always select the action with highest value. We assume that we do not know the action values with certainty, although we may have estimates.
+*  If we maintain estimates of the action values, then at any time step there is at least one action whose estimated value is greatest. We call this a **greedy action**.
+*  If we **select a greedy action**, then we are **exploiting our current knowledge of the values of the actions**.
+*  If we **select one of the nongreedy actions**, then we are **exploring**, because this enables us to improve our estimate of the nongreedy action’s value.
+*  Exploitation is the right thing to do to maximize the expected reward on the one step, but exploration may produce the greater total reward in the long run.
+*  For example, suppose the greedy action’s value is known with certainty, while several other actions are estimated to be nearly as good but with substantial uncertainty. The uncertainty is such that at least one of these other actions probably is actually better than the greedy action, but you don’t know which one. If we have many time steps ahead on which to make action selections, then it may be better to explore the nongreedy actions and discover which of them are better than the greedy action.
+*  Reward is lower in the short run, during exploration, but higher in the long run because after we have discovered the better actions, we can exploit them many times. Because it is not possible both to explore and to exploit with any single action selection, one often refers to the “conflict” between exploration and exploitation.
+*  In any specific case, whether it is better to explore or exploit depends in a
+complex way on the precise values of the estimates, uncertainties, and the number of remaining steps. There are many sophisticated methods for balancing
+exploration and exploitation for particular mathematical formulations of the
+n-armed bandit and related problems. However, most of these methods make
+strong assumptions about stationarity and prior knowledge that are either
+violated or impossible to verify in applications and in the full reinforcement
+learning problem that we consider in subsequent chapters. The guarantees of
+optimality or bounded loss for these methods are of little comfort when the
+assumptions of their theory do not apply.
 ### 2.2 Action-Value Methods 
 ### 2.3 Incremental Implementation
 ### 2.4 Tracking a Nonstationary Problem
