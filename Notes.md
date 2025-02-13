@@ -114,16 +114,65 @@ enable us to see most clearly how evaluative feedback differs from, and yet can 
 *  Exploitation is the right thing to do to maximize the expected reward on the one step, but exploration may produce the greater total reward in the long run.
 *  For example, suppose the greedy action’s value is known with certainty, while several other actions are estimated to be nearly as good but with substantial uncertainty. The uncertainty is such that at least one of these other actions probably is actually better than the greedy action, but you don’t know which one. If we have many time steps ahead on which to make action selections, then it may be better to explore the nongreedy actions and discover which of them are better than the greedy action.
 *  Reward is lower in the short run, during exploration, but higher in the long run because after we have discovered the better actions, we can exploit them many times. Because it is not possible both to explore and to exploit with any single action selection, one often refers to the “conflict” between exploration and exploitation.
-*  In any specific case, whether it is better to explore or exploit depends in a
-complex way on the precise values of the estimates, uncertainties, and the number of remaining steps. There are many sophisticated methods for balancing
-exploration and exploitation for particular mathematical formulations of the
-n-armed bandit and related problems. However, most of these methods make
-strong assumptions about stationarity and prior knowledge that are either
-violated or impossible to verify in applications and in the full reinforcement
-learning problem that we consider in subsequent chapters. The guarantees of
-optimality or bounded loss for these methods are of little comfort when the
-assumptions of their theory do not apply.
+*  In any specific case, whether it is better to explore or exploit depends in a complex way on the precise values of the estimates, uncertainties, and the number of remaining steps.
+*  There are many sophisticated methods for balancing exploration and exploitation for particular mathematical formulations of the n-armed bandit and related problems. However, most of these methods make strong assumptions about stationarity and prior knowledge that are either violated or impossible to verify in applications and in the full reinforcement learning problem that we consider in subsequent chapters. The guarantees of optimality or bounded loss for these methods are of little comfort when the assumptions of their theory do not apply.
+  
 ### 2.2 Action-Value Methods 
+#### Methods for estimating the values of actions and for using the estimates to make action selection decisions.
+* Let true (actual) value of action a = **q(a)**,
+  
+   and the estimated value on the t-th time step = **Q<sub>t</sub>(a)**
+  
+   As the true value of an action is the **mean reward received when that action is selected**. One natural way to estimate this is by **averaging the rewards actually received when the action was selected**.
+  
+   In other words, if by the t-th time step action a has been chosen **N<sub>t</sub>(a)** times prior to **t**, yielding rewards **R1, R2, . . . , R<sub>N <sub>t</sub> (a)</sub>**, then its value is estimated to be **Q<sub>t</sub>(a) = R1 + R2 + · · · +  R<sub>N <sub>t</sub> (a)</sub> /N<sub>t</sub>(a)**.
+* If **N<sub>t</sub>(a) = 0**, then we define Q<sub>t</sub>(a) instead as some default value, such as **Q<sub>1</sub>(a) = 0**. As **N<sub>t</sub>(a) → ∞**, by the law of large numbers, Q<sub>t</sub>(a) converges to q(a).
+* We call this the **sample-average method** for estimating action values because each estimate is a **simple average** of the sample of relevant rewards.**(not necessarily the best method)**.
+* Nevertheless, for now let us stay with this simple estimation method and turn to the question of **how the estimates might be used to select actions?**.
+* The simplest **action selection rule** is to select the action (or one of the actions) with **highest estimated action value**, that is, to select at step t one of the greedy actions, **A<sup>*</sup><sub>t</sub>**, for which
+  
+  <div align="center"> 
+    Q<sub>t</sub>(A<sup>∗</sup><sub>t</sub>) = max<sub>a</sub> Q<sub>t</sub>(a).
+  </div>
+
+  This **greedy action selection method** can be written as
+  <div align="center"> 
+    A<sub>t</sub> = argmax<sub>a</sub> Q<sub>t</sub>(a)
+  </div>
+
+* **Greedy action selection** always exploits current knowledge to maximize immediate reward; it spends no time at all sampling apparently inferior actions to see if they might really be better.
+* A simple alternative is to behave greedily most of the time, but every once in a while, say with small probability **ε**, instead to select randomly from amongst all the actions with equal probability independently of the action value estimates. We call methods using this near-greedy action selection rule **ε-greedy methods**. An advantage of these methods is that, in the limit as the number of plays increases, every action will be sampled an infinite number of times, guaranteeing that N<sub>t</sub>(a) → ∞ for all a, and thus ensuring that all the Q<sub>t</sub>(a) converge to q(a). This of course implies that the probability of selecting the optimal action converges to greater than **1 − ε** , that is, to near certainty. (These are just asymptotic guarantees),
+#### **The practical effectiveness of these methods**:
+* To roughly assess the relative effectiveness of the **greedy and ε-greedy methods**, we compared them numerically on a suite of test problems.
+* This was a set of **2000 randomly generated n-armed bandit tasks** with **n = 10**.
+* For each bandit, the action values, **q(a), a = 1, . . . , 10**, were selected according to a **normal (Gaussian) distribution with mean 0 and variance 1**.
+* On t-th time step with a given bandit, the actual reward **R<sub>t</sub>** was the **q(A<sub>t</sub>)** for the bandit **(where A<sub>t</sub> was the action selected)** plus a **normally distributed** noise term that was **mean 0** and **variance 1**.
+* Averaging over bandits, we can plot the performance and behavior of various methods as they improve with experience over 1000 steps, as in Figure. We call this suite of test tasks the **10-armed testbed**.
+
+* figure: Average performance of ε-greedy action-value methods on the 10-armed testbed. These data are averages over 2000 tasks. All methods used sample averages as their action-value estimates. The detailed structure at the beginning of these curves depends on how actions are selected when multiple actions have the same maximal action value. Here such ties were
+broken randomly. An alternative that has a similar effect is to add a verysmall amount of randomness to each of the initial action values, so that ties effectively never happen.
+
+
+
+* This figure **compares a greedy method with two ε-greedy methods (ε = 0.01 and ε = 0.1)**, as described above, on the 10-armed testbed.
+* Both methods formed their action-value estimates using the sample-average technique.
+* The **upper graph shows the increase in expected reward with experience**.
+* The **greedy method improved slightly faster** than the other methods **at the very beginning**, but then **leveled off at a lower level**. It achieved **a reward per step of only 
+  about 1**, compared with the **best possible of about 1.55** on this testbed.
+* The **greedy method performs significantly worse in the long run** because it often gets stuck performing suboptimal actions.
+* The **lower graph shows that the greedy method found the optimal action in only approximately one-third of the tasks**. In the other two-thirds, its initial samples of the optimal action were disappointing, and it never returned to it.
+* The **ε-greedy methods eventually perform better** because they **continue to explore**, and to improve their chances of recognizing the optimal action.
+* The ε = 0.1 method explores more, and usually finds the optimal action earlier, but never selects it more than 91% of the time.
+* The ε = 0.01 method improves more slowly, but eventually performs better than the ε = 0.1 method on both performance measures.
+*   It is also possible to reduce ε over time to try to get the best of both high and low values.
+* The advantage of ε-greedy over greedy methods depends on the task.
+* For example, suppose the **reward variance** had been **larger**, say **10** instead of 1. With noisier rewards it takes **more exploration** to find the optimal action, and ε-greedy 
+  methods should fare even better relative to the greedy method.
+* On the other hand, if the **reward variances were zero**, then the greedy method would know the true value of each action after trying it once. In this case the greedy method might 
+  actually perform best because it would soon find the optimal action and then never explore.
+* But even in the deterministic case, there is a large advantage to exploring if we weaken some of the other assumptions.
+* For example, suppose the bandit task were nonstationary, that is, that the true values of the actions changed over time. In this case exploration is needed even in the deterministic case to make sure one of the nongreedy actions has not changed to become better than the greedy one. As we will see in the next few chapters, **effective nonstationarity is the case most commonly encountered in reinforcement learning**. Even if the underlying task is stationary and deterministic, the learner faces a set of banditlike decision tasks each of which changes over time due to the learning process itself. Reinforcement learning requires a balance between exploration and exploitation.
+  
 ### 2.3 Incremental Implementation
 ### 2.4 Tracking a Nonstationary Problem
 ### 2.5 Optimistic Initial Values 
