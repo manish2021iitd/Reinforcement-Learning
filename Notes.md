@@ -346,7 +346,29 @@ broken randomly. An alternative that has a similar effect is to add a verysmall 
 ### 2.6 Upper-Confidence-Bound Action Selection
 ### 2.7 Gradient Bandits
 ### 2.8 Associative Search (Contextual Bandits)
+* 
 ### 2.9 Summary
+* several simple ways of balancing exploration and exploitation.
+* The ε-greedy methods choose randomly a small fraction of the time, whereas UCB methods choose deterministically but achieve exploration by subtly favoring at each step the actions that have so far received fewer samples.
+* Gradient-bandit algorithms estimate not action values, but action preferences, and favor the more preferred actions in a graded, probabalistic manner using a soft-max distribution.
+* The simple expedient of initializing  estimates optimistically causes even greedy methods to explore significantly
+ChatGPT said:
+This idea is called **optimistic initial values**, a simple yet effective technique in reinforcement learning (RL) and multi-armed bandit problems. By initializing action-value estimates Q(a) with high values, the agent is encouraged to explore more in the early stages.
+
+Why Does This Work?
+
+If an agent starts with a high estimate for all actions, it will initially pick actions greedily.
+Since these values are overly optimistic, the agent will observe lower rewards than expected, causing the estimated value to decrease.
+As it updates its estimates, it will naturally explore other actions to find better ones.
+
+Example: k-Armed Bandit
+Consider a 10-armed bandit problem where the true action values are normally distributed with mean 0. If we: Initialize 
+Q(a)=5 for all actions (optimistic), Use a greedy action selection strategy, The agent will try different actions because the initially chosen action will have its estimate lowered after a few trials, making other actions more appealing.
+* Gradient Bandit vs Epsilon Greddy vs UCB, which methods is best?
+*  A complication is that they all have a parameter ⍺/c/Q ; to get a meaningful comparison we will have to consider their performance as a function of their parameter.
+*  Graphs for each algorithm are too visually confusing to show such a learning curve for each algorithm and parameter value. Instead we summarize **a complete learning curve by its
+average value over the 1000 steps**; this value is **proportional to the area under the learning curves**.( all the algorithms perform best at an intermediate value of their parameter, neither too large nor too big. ) Overall, UCB seems to perform best.
+
 
 ## 3 Finite Markov Decision Processes (RL problems in terms of optimal control of Markov decision processes)
 * The general problem formulation that is—**finite markov decision processes**—and its main ideas including Bellman equations and value functions.
@@ -378,6 +400,7 @@ broken randomly. An alternative that has a similar effect is to add a verysmall 
 ## 5 Monte Carlo Methods 
 * method for solving finite Markov decision problems.
 * Monte Carlo methods don’t require a model **(no model)** and are conceptually simple, but are not suited for step-by-step incremental computation **(not incremental)**.
+*  learning methods for solving the full reinforcement learning problem.
 ### 5.1 Monte Carlo Prediction
 ### 5.2 Monte Carlo Estimation of Action Values 
 ### 5.3 Monte Carlo Control 
@@ -390,7 +413,8 @@ broken randomly. An alternative that has a similar effect is to add a verysmall 
 
 ## 6 Temporal-Difference Learning 
 * method for solving finite Markov decision problems
-* Temporal-difference methods require **no model** and are **fully incremental**, but are more **complex** to analyze. 
+* Temporal-difference methods require **no model** and are **fully incremental**, but are more **complex** to analyze.
+* 
 ### 6.1 TD Prediction 
 ### 6.2 Advantages of TD Prediction Methods 
 ### 6.3 Optimality of TD(0) 
