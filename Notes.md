@@ -341,12 +341,71 @@ broken randomly. An alternative that has a similar effect is to add a verysmall 
 * For example, suppose the bandit task were nonstationary, that is, that the true values of the actions changed over time. In this case exploration is needed even in the deterministic case to make sure one of the nongreedy actions has not changed to become better than the greedy one. As we will see in the next few chapters, **effective nonstationarity is the case most commonly encountered in reinforcement learning**. Even if the underlying task is stationary and deterministic, the learner faces a set of banditlike decision tasks each of which changes over time due to the learning process itself. Reinforcement learning requires a balance between exploration and exploitation.
   
 ### 2.3 Incremental Implementation
+* As all estimate action values are sample averages of observed rewards. 
+* The obvious implementation is to maintain  for each action a, a record of all the rewards that have followed the selection of that action.
+*  Then, when the estimate of the value of action a is needed at time t, it can be computed according to (2.1), which we repeat here:
+
 ### 2.4 Tracking a Nonstationary Problem
 ### 2.5 Optimistic Initial Values 
 ### 2.6 Upper-Confidence-Bound Action Selection
+* Exploration is needed because the estimates of the action values are uncertain.
+  * Uncertainty in Action Value Estimates:
+  * Initially, the agent has no knowledge of the environment and therefore has uncertain estimates of the action values.
+  * This uncertainty arises from two main sources:
+    * Limited data: The agent has only observed a limited number of state-action transitions and their corresponding rewards. As a result, its estimates of the action values are based on a small sample of data and are therefore uncertain.
+    * Stochasticity of the environment: The environment may be inherently stochastic, meaning that the same action in the same state can lead to different outcomes. This stochasticity introduces further uncertainty into the action value estimates.
+    
+* The greedy actions are those that look best at present, but some of the other actions may actually be better. ε-greedy action selection forces the non-greedy actions to be tried, but indiscriminately, with no preference for those that are nearly greedy or particularly uncertain. It would be better to select among the non-greedy actions according to their potential for actually being optimal, taking into account both how close their estimates are to being maximal and the uncertainties in those estimates. One effective way of doing this is to select actions as
+
+<div align="center">
+A<sub>t</sub> = argmax<sub>a</sub>(Q(a) + c * sqrt(ln(t) / N(a)))
+</div>
+  
+  * where c > 0 controls the degree of exploration. 
+  * If Nt(a) = 0, then a is considered to be a maximizing action.
+    
+* The **idea of this upper confidence bound (UCB) action selection** is that **the square-root term is a measure of the uncertainty or variance in the estimate of a’s value**.
+  * The quantity being max’ed over is thus a sort of **upper bound on the possible true value of action a**, with the **c parameter determining the confidence level**.
+  * Each time a is selected the uncertainty is presumably reduced; Nt(a) is incremented and, as it appears in the denominator of the uncertainty term, the term is decreased.
+  * On the other hand, each time an action other a is selected t is increased; as it appears in the numerator the uncertainty estimate is increased.
+  * The use of the natural logarithm means that the increase gets smaller over time, but is unbounded; all actions will eventually be selected, but as time goes by it will be a longer 
+    wait, and thus a lower selection frequency, for actions with a lower value estimate or that have already been selected more times.
+
+Figure 2.3: Average performance of UCB action selection on the 10-armed testbed. As shown, UCB generally performs better that ε-greedy action selection, except in the first n plays, when it selects randomly among the as-yet unplayed actions. UCB with c = 1 would perform even better but would not show the prominent spike in performance on the 11th play. Can you think of an explanation of this spike?
+
+* Results with UCB on the 10-armed testbed are shown in Figure 2.3. UCB will often perform well, as shown here, but is more difficult than ε-greedy to extend beyond bandits to the more general reinforcement learning settings considered in the rest of this book.
+* One difficulty is in dealing with nonstationary problems; something more complex than the methods presented in Section 2.4 would be needed. Another difficulty is dealing with large state spaces, particularly function approximation as developed in Part III of this book. In these more advanced settings there is currently no known practical way of utilizing the idea of UCB action selection.
+  
 ### 2.7 Gradient Bandits
+* We have seen methods that estimate action values and use those estimates to select actions.(a good approach, but it is not the only one possible.)
+* Now, we consider learning a numerical preference **H<sub>t</sub>(a)** for each action a.
+
+  The larger the preference, the more often that action is taken, but the preference has no interpretation in terms of reward.
+
+  Only the relative preference of one action over another is important; if we add 1000 to all the preferences there is no affect on the action probabilities, which are determined 
+  according to a soft-max distribution (i.e., Gibbs or Boltzmann distribution) as follows:
+
+
 ### 2.8 Associative Search (Contextual Bandits)
+* Nonassociative tasks, in which there is no need to associate different actions with different situations. In these tasks the learner either tries to find a single best action when the task is stationary, or tries to track the best action as it changes over time when the task is nonstationary.
+* In a general reinforcement learning task there is more than one situation, and the goal is to learn a policy: a mapping from situations to the actions that are best in those situations.
+* To extend nonassociative tasks into the associative setting:
+  
+  Example:
+
+  Suppose there are several different n-armed bandit tasks, and that on each play you confront one of these chosen at random. Thus, the bandit task changes randomly from play 
+  to play. This would appear to us as a single, nonstationary n-armed bandit task whose true action values change randomly from play to play. We could try using one of the methods 
+  that can handle nonstationarity, but unless the true action values change slowly, these methods will not work very well.
+
+  Now suppose, however, that when a bandit task is selected for us, we are given some distinctive clue about its identity (but not its action values). Maybe we are facing an actual 
+  slot machine that changes the color of its display as it changes its action values. Now you can learn a policy associating each task, signaled by the color you see, with the best 
+  action to take when facing that task—for instance, if red, play arm 1; if green, play arm 2. With the right policy we can usually do much better than we could in the absence of any 
+  information distinguishing one bandit task from another.
+
+* This is **an example of an associative search task**, so called because **it involves both trial-and-error learning in the form of search for the best actions and association of these actions with the situations in which they are best**(Associative search tasks are often now termed contextual bandits in the literature).
+* Associative search tasks are intermediate between the n-armed bandit problem and the full reinforcement learning problem. They are like the full reinforcement learning problem in that they involve learning a policy, but like our version of the n-armed bandit problem in that each action affects only the immediate reward. If actions are allowed to affect the next situation as well as the reward, then we have the full reinforcement learning problem.
 * 
+  
 ### 2.9 Summary
 * several simple ways of balancing exploration and exploitation.
 * The ε-greedy methods choose randomly a small fraction of the time, whereas UCB methods choose deterministically but achieve exploration by subtly favoring at each step the actions that have so far received fewer samples.
@@ -377,12 +436,50 @@ average value over the 1000 steps**; this value is **proportional to the area un
 ###  3.2 Goals and Rewards
 ### 3.3 Returns 
 ### 3.4 Unified Notation for Episodic and Continuing Tasks 
+* Two kinds of reinforcement learning tasks:
+  * one in which the agent–environment interaction naturally breaks down into a sequence of separate episodes (episodic tasks), and
+  * one in which it does not (continuing tasks).
+* The **Epsisodic task** is mathematically **easier** because **each action affects only the finite number of rewards subsequently received during
+the episode**.
+* The episodic tasks requires some additional notation. Rather than one long sequence of time steps, we need to consider a series of episodes, each of which consists of a finite sequence of time steps. We number the time steps of each episode starting a new from zero. Therefore, we have to refer not just to **S<sub>t</sub>**, the state representation at time t, but to **S<sub>t,i</sub>**, the state representation at time t of episode i (and similarly for **A<sub>t,i</sub>**, **R<sub>t,i</sub>**, **π<sub>t,i</sub>**, **T<sub>i</sub>**, etc.).
+* However, it turns out that, when we discuss episodic tasks we will almost never have to distinguish between different episodes. We will almost always be considering a particular single episode, or stating something that is true for all episodes.
+* Accordingly, in practice we will almost always abuse notation slightly by dropping the explicit reference to episode number. That is, we will write **S<sub>t</sub>** to refer to **S<sub>t,i</sub>**, and so on.
+* We need one other convention to obtain a single notation that covers both episodic and continuing tasks. We have defined the **return as a sum over a finite number of terms in one case (G<sub>t</sub> = R<sub>t</sub>+1 + R<sub>t</sub>+2 + R<sub>t</sub>+3 + · · · + R<sub>T</sub> )** and as a **sum over an infinite number of terms in the other (G<sub>t</sub> = R<sub>t+1</sub> + γR<sub>t+2</sub> + γ<sup>2</sup>R<sub>t+3</sub> + · · · )**. These can be unified by considering episode termination to be the entering of a special absorbing state that transitions only to itself and that generates only rewards of zero. For example, consider the state transition diagram
+
 ### 3.5 The Markov Property 
 ### 3.6 Markov Decision Processes 
 ### 3.7 Value Functions 
 ### 3.8 Optimal Value Functions 
 ### 3.9 Optimality and Approximation 
 ### 3.10 Summary 
+* The elements of the reinforcement learning problem:
+* Reinforcement learning is about learning from interaction how to behave in order to achieve a goal.
+* The reinforcement learning agent and its environment interact over a sequence of discrete time steps.
+* The specification of their interface defines a particular task:
+  * the actions are the choices made by the agent;
+  * the states are the basis for making the choices;
+  * and the rewards are the basis for evaluating the choices.
+* Everything inside the agent is completely known and controllable by the agent; everything outside is incompletely controllable but may or may not be completely known.
+* A policy is a stochastic rule by which the agent selects actions as a function of states.
+* The agent’s objective is to maximize the amount of reward it receives over time.
+* The return is the function of future rewards that the agent seeks to maximize. It has several different definitions depending upon the nature of the task and whether one wishes to discount delayed reward.
+* The undiscounted formulation is appropriate for episodic tasks, in which the agent–environment interaction breaks naturally into episodes; the discounted formulation is appropriate for continuing tasks, in which the interaction does not naturally break into episodes but continues without limit.
+* An environment satisfies the Markov property if its state signal compactly summarizes the past without degrading the ability to predict the future. This is rarely exactly true, but often nearly so; the state signal should be chosen or constructed so that the Markov property holds as nearly as possible. We assume that this has already been done and focus on the decision making problem: how to decide what to do as a function of whatever state signal is available.
+* If the Markov property does hold, then the environment is called a **Markov decision process (MDP)**.
+* A finite MDP is an MDP with finite state and action sets. Most of the current theory of reinforcement learning is restricted to finite MDPs, but the methods and ideas apply more
+generally.
+* A policy’s value functions assign to each state, or state–action pair, the expected return from that state, or state–action pair, given that the agent uses the policy.
+* The optimal value functions assign to each state, or state–action pair, the largest expected return achievable by any policy.
+* A policy whose value functions are optimal is an **optimal policy**. Whereas the **optimal value functions for states and state–action pairs are unique for a given MDP**, there can be many optimal policies.
+* Any policy that is greedy with respect to the optimal value functions **must be an optimal policy**.
+* The **Bellman optimality equations are special consistency condition** that the optimal value functions must satisfy and that can, in principle, be solved for the optimal value functions, from which an optimal policy can be determined with relative ease.
+* A reinforcement learning problem can be posed in a variety of different ways depending on assumptions about the level of knowledge initially available to the agent.
+* In problems of complete knowledge, the agent has a complete and accurate model of the environment’s dynamics. If the environment is an MDP, then such a model consists of the one-step transition probabilities and expected rewards for all states and their allowable actions.
+* In problems of incomplete knowledge, a complete and perfect model of the environment is not available.
+* Even if the agent has a complete and accurate environment model, the agent is typically unable to perform enough computation per time step to fully use it.
+* The memory available is also an important constraint. Memory may be required to build up accurate approximations of value functions, policies, and models. In most cases of practical interest there are far more states than could possibly be entries in a table, and approximations must be made.
+* A well-defined notion of optimality organizes the approach to learning and provides a way to understand the theoretical properties of various learning algorithms, but it is an ideal that reinforcement learning agents can only approximate to varying degrees.
+* In reinforcement learning we are very much concerned with cases in which optimal solutions cannot be found but must be approximated in some way.
 
 ## 4 Dynamic Programming 
 * method for solving finite Markov decision problems
@@ -396,11 +493,38 @@ average value over the 1000 steps**; this value is **proportional to the area un
 ### 4.6 Generalized Policy Iteration 
 ### 4.7 Efficiency of Dynamic Programming 
 ### 4.8 Summary 
+* The basic ideas and algorithms of **dynamic programming** as they relate **to solving finite MDPs**.
+* **Policy evaluation** refers to the (typically) **iterative computation of the value functions for a given policy**.
+* **Policy improvement** refers to the **computation of an improved policy given the value function for that policy**.
+* **Policy iteration/Value iteration  = Policy evaluation + Policy improvement**  (two most popular DP methods)
+*  **Policy iteration/Value iteration** can be used to reliably **compute optimal policies and value functions for finite MDPs** given complete knowledge of the MDP.
+* **Classical DP** methods operate in **sweeps through the state set**, performing a full backup operation on each state.
+  * Each backup updates the value of one state based on the values of all possible successor states and their probabilities of occurring.
+  * Full backups are closely related to Bellman equations: they are little more than these equations turned into assignment statements.
+  * When the backups no longer result in any changes in value, convergence has occurred to values that satisfy the corresponding Bellman equation.
+  * Just as there are four primary value functions (vπ, v∗, qπ, and q∗), there are four corresponding Bellman equations and four corresponding full backups.
+  * An intuitive view of the operation of backups is given by backup diagrams.
+* DP methods and almost all reinforcement learning methods, can be gained by viewing them as **generalized policy iteration (GPI)**.
+* **GPI** is the general idea of two interacting processes revolving around an approximate policy and an approximate value function.
+  * One process takes the policy as given and performs some form of policy evaluation, changing the value function to be more like the true value function for the policy.
+  * The other process takes the value function as given and performs some form of policy improvement, changing the policy to make it better, assuming that the value function is its 
+    value function.
+* Although each process changes the basis for the other, overall they work together to find a joint solution: **a policy and value function that are unchanged by either process and, 
+consequently, are optimal.**
+* In some cases, GPI can be proved to converge, most notably for the classical DP methods.
+* In other cases convergence has not been proved, but still the idea of GPI improves our understanding of the methods.
+* It is not necessary to perform DP methods in complete sweeps through the state set.
+* Asynchronous DP methods are in-place iterative methods that back up states in an arbitrary order, perhaps stochastically determined and using out-of-date information. Many of these methods can be viewed as fine-grained forms of GPI.
+* Special property of DP methods: All of them update estimates of the values of states based on estimates of the values of successor states. That is, they update estimates on the basis of other estimates **(bootstrapping)**.
+* Many reinforcement learning methods perform bootstrapping, even those that do not require, as DP requires, a complete and accurate model of the environment.
+* In the next chapter we explore reinforcement learning methods that do not require a model and do not bootstrap. In the chapter after that we explore methods that do not require
+a model but do bootstrap.
 
 ## 5 Monte Carlo Methods 
 * method for solving finite Markov decision problems.
 * Monte Carlo methods don’t require a model **(no model)** and are conceptually simple, but are not suited for step-by-step incremental computation **(not incremental)**.
 *  learning methods for solving the full reinforcement learning problem.
+*  methods that do not require a model and do not bootstrap.
 ### 5.1 Monte Carlo Prediction
 ### 5.2 Monte Carlo Estimation of Action Values 
 ### 5.3 Monte Carlo Control 
@@ -414,7 +538,7 @@ average value over the 1000 steps**; this value is **proportional to the area un
 ## 6 Temporal-Difference Learning 
 * method for solving finite Markov decision problems
 * Temporal-difference methods require **no model** and are **fully incremental**, but are more **complex** to analyze.
-* 
+* methods that do not require a model but do bootstrap.
 ### 6.1 TD Prediction 
 ### 6.2 Advantages of TD Prediction Methods 
 ### 6.3 Optimality of TD(0) 
