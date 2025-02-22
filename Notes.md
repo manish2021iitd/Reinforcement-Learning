@@ -450,8 +450,22 @@ the episode**.
 * The episodic tasks requires some additional notation. Rather than one long sequence of time steps, we need to consider a series of episodes, each of which consists of a finite sequence of time steps. We number the time steps of each episode starting a new from zero. Therefore, we have to refer not just to **S<sub>t</sub>**, the state representation at time t, but to **S<sub>t,i</sub>**, the state representation at time t of episode i (and similarly for **A<sub>t,i</sub>**, **R<sub>t,i</sub>**, **π<sub>t,i</sub>**, **T<sub>i</sub>**, etc.).
 * However, it turns out that, when we discuss episodic tasks we will almost never have to distinguish between different episodes. We will almost always be considering a particular single episode, or stating something that is true for all episodes.
 * Accordingly, in practice we will almost always abuse notation slightly by dropping the explicit reference to episode number. That is, we will write **S<sub>t</sub>** to refer to **S<sub>t,i</sub>**, and so on.
-* We need one other convention to obtain a single notation that covers both episodic and continuing tasks. We have defined the **return as a sum over a finite number of terms in one case (G<sub>t</sub> = R<sub>t+1</sub> + R<sub>t+2</sub> + R<sub>t+3</sub> + · · · + R<sub>T</sub> )** and as a **sum over an infinite number of terms in the other (G<sub>t</sub> = R<sub>t+1</sub> + γR<sub>t+2</sub> + γ<sup>2</sup>R<sub>t+3</sub> + · · · )**. These can be unified by considering episode termination to be the entering of a special absorbing state that transitions only to itself and that generates only rewards of zero. For example, consider the state transition diagram
-![State transition Diagram](<img width="858" alt="Image" src="https://github.com/user-attachments/assets/3b7c6fa0-79a5-415d-a85e-4559d23b4fa6" />)
+* We need one other convention to obtain a single notation that covers both episodic and continuing tasks. We have defined the **return as a sum over a finite number of terms in one case (G<sub>t</sub> = R<sub>t+1</sub> + R<sub>t+2</sub> + R<sub>t+3</sub> + · · · + R<sub>T</sub> )** and as a **sum over an infinite number of terms in the other (G<sub>t</sub> = R<sub>t+1</sub> + γR<sub>t+2</sub> + γ<sup>2</sup>R<sub>t+3</sub> + · · · )**. These can be unified by considering episode termination to be the entering of a special absorbing state that transitions only to itself and that generates only rewards of zero.
+* For example, consider the state transition diagram
+
+<img width="858" alt="Image" src="https://github.com/user-attachments/assets/3b7c6fa0-79a5-415d-a85e-4559d23b4fa6" />
+
+  * solid square represents the special absorbing state corresponding to the end of an episode. Starting from $S_{0}$, we get the reward sequence **+1, +1, +1, 0, 0, 0, . . .**.
+  * Summing these, we get the same return whether we sum over the first T rewards (here T = 3) or over the full infinite sequence.
+  * This remains true even if we introduce discounting.
+  * Thus, we can define the return, in general, according to (3.2), using the convention of omitting episode numbers when they are not needed, and including the possibility that γ = 1 
+     if the sum remains defined (e.g., because all episodes terminate)
+   Alternatively, we can also write the return as
+
+including the possibility that T = ∞ or γ = 1 (but not both6
+). We use these
+conventions throughout the rest of the book to simplify notation and to express
+the close parallels between episodic and continuing tasks.
 ### 3.5 The Markov Property 
 ### 3.6 Markov Decision Processes 
 ### 3.7 Value Functions 
