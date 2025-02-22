@@ -444,7 +444,7 @@ the episode**.
 * The episodic tasks requires some additional notation. Rather than one long sequence of time steps, we need to consider a series of episodes, each of which consists of a finite sequence of time steps. We number the time steps of each episode starting a new from zero. Therefore, we have to refer not just to **S<sub>t</sub>**, the state representation at time t, but to **S<sub>t,i</sub>**, the state representation at time t of episode i (and similarly for **A<sub>t,i</sub>**, **R<sub>t,i</sub>**, **π<sub>t,i</sub>**, **T<sub>i</sub>**, etc.).
 * However, it turns out that, when we discuss episodic tasks we will almost never have to distinguish between different episodes. We will almost always be considering a particular single episode, or stating something that is true for all episodes.
 * Accordingly, in practice we will almost always abuse notation slightly by dropping the explicit reference to episode number. That is, we will write **S<sub>t</sub>** to refer to **S<sub>t,i</sub>**, and so on.
-* We need one other convention to obtain a single notation that covers both episodic and continuing tasks. We have defined the **return as a sum over a finite number of terms in one case (G<sub>t</sub> = R<sub>t</sub>+1 + R<sub>t</sub>+2 + R<sub>t</sub>+3 + · · · + R<sub>T</sub> )** and as a **sum over an infinite number of terms in the other (G<sub>t</sub> = R<sub>t+1</sub> + γR<sub>t+2</sub> + γ<sup>2</sup>R<sub>t+3</sub> + · · · )**. These can be unified by considering episode termination to be the entering of a special absorbing state that transitions only to itself and that generates only rewards of zero. For example, consider the state transition diagram
+* We need one other convention to obtain a single notation that covers both episodic and continuing tasks. We have defined the **return as a sum over a finite number of terms in one case (G<sub>t</sub> = R<sub>t+1</sub> + R<sub>t+2</sub> + R<sub>t+3</sub> + · · · + R<sub>T</sub> )** and as a **sum over an infinite number of terms in the other (G<sub>t</sub> = R<sub>t+1</sub> + γR<sub>t+2</sub> + γ<sup>2</sup>R<sub>t+3</sub> + · · · )**. These can be unified by considering episode termination to be the entering of a special absorbing state that transitions only to itself and that generates only rewards of zero. For example, consider the state transition diagram
 
 ### 3.5 The Markov Property 
 ### 3.6 Markov Decision Processes 
@@ -491,7 +491,41 @@ generally.
 ### 4.4 Value Iteration 
 ### 4.5 Asynchronous Dynamic Programming
 ### 4.6 Generalized Policy Iteration 
+* Policy iteration consists of two simultaneous, interacting processes:
+  *  one making the value function consistent with the current policy (policy evaluation),
+  *  the other making the policy greedy with respect to the current value function (policy improvement).
+* In policy iteration, these two processes alternate, each completing before the other begins, but this is not really necessary.
+* In value iteration, for example, only a single iteration of policy evaluation is performed in between each policy improvement.
+* In asynchronous DP methods, the evaluation and improvement processes are interleaved at an even finer grain.
+* In some cases a single state is updated in one process before returning to the other. As long as both processes continue to update all states, the ultimate result is typically the same—convergence to the optimal value function and an optimal policy.
+* Generalized policy iteration (GPI) : **the general idea of policy evaluation and policy improvement processes**.
+*  Almost all RL methods are well described as GPI. That is, all have identifiable policies and value functions, with the policy always being improved with respect to the value function and the value function always being driven toward the value function for the policy. This overall schema for GPI is:
+
+    
+* It is easy to see that if both the evaluation process and the improvement process stabilize, that is, no longer produce changes, then the value function and policy must be optimal.
+* The value function stabilizes only when it is consistent with the current policy, and the policy stabilizes only when it is greedy with respect to the current value function. Thus, both processes stabilize only when a policy has been found that is greedy with respect to its own evaluation function. This implies that the Bellman optimality equation holds, and
+thus that the policy and the value function are optimal.
+The evaluation and improvement processes in GPI can be viewed as both
+competing and cooperating. They compete in the sense that they pull in opposing directions. Making the policy greedy with respect to the value function
+typically makes the value function incorrect for the changed policy, and making the value function consistent with the policy typically causes that policy no
+longer to be greedy. In the long run, however, these two processes interact to
+find a single joint solution: the optimal value function and an optimal policy.
+One might also think of the interaction between the evaluation and improvement processes in GPI in terms of two constraints or goals—for example,
+as two lines in two-dimensional space
+
 ### 4.7 Efficiency of Dynamic Programming 
+* DP may **not be practical for very large problems**, but **compared with other methods for solving MDP**s, DP methods are actually **quite efficient**.
+* The **(worst case) time** DP methods take **to find an optimal policy is polynomial** in the number of states and actions.
+* If n and m denote the number of states and actions, this means that a DP method takes a number of computational operations that is less than some polynomial function of n and m.
+* A DP method is **guaranteed to find an optimal policy in polynomial time** even though the total number of (deterministic) policies **is mn**.
+* In this sense, DP is **exponentially faster than any direct search** in policy space could be, because direct search would have to exhaustively examine each policy to provide the same guarantee.
+* Linear programming methods can also be used to solve MDPs, and in some cases their worst-case convergence guarantees are better than those of DP methods. But linear programming methods become impractical at a much smaller number of states than do DP methods (by a factor of about 100).
+* For the largest problems, only DP methods are feasible.
+* DP is sometimes thought to be of limited applicability because of the curse of dimensionality (Bellman, 1957a), the fact that the number of states often grows exponentially with the number of state variables. Large state sets do create difficulties, but these are inherent difficulties of the problem, not of DP as a solution method. In fact, DP is comparatively better suited to handling large state spaces than competing methods such as direct search and linear programming.
+* In practice, DP methods can be used with today’s computers to solve MDPs with millions of states. Both policy iteration and value iteration are widely used, and it is not clear which, if either, is better in general. In practice, these methods usually converge much faster than their theoretical worst-case
+run times, particularly if they are started with good initial value functions or policies.
+* On problems with **large state spaces**, **asynchronous DP methods are often preferred**. To complete even one sweep of a synchronous method requires computation and memory for every state. For some problems, even this much memory and computation is impractical, yet the problem is still potentially solvable because only a relatively few states occur along optimal solution trajectories. Asynchronous methods and other variations of GPI can be applied in such cases and may find good or optimal policies much faster than synchronous methods can.
+
 ### 4.8 Summary 
 * The basic ideas and algorithms of **dynamic programming** as they relate **to solving finite MDPs**.
 * **Policy evaluation** refers to the (typically) **iterative computation of the value functions for a given policy**.
