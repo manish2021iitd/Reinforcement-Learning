@@ -430,9 +430,15 @@ average value over the 1000 steps**; this value is **proportional to the area un
 
 
 ## 3 Finite Markov Decision Processes (RL problems in terms of optimal control of Markov decision processes)
-* The general problem formulation that is—**finite markov decision processes**—and its main ideas including Bellman equations and value functions.
+* The general problem formulation that is—**finite markov decision processes**—and its main ideas including **Bellman equations** and **value functions**.
+* This problem defines the field of reinforcement learning: any method that is suited to solving this problem we consider to be a reinforcement learning method.
+
+### 3.1 The Agent–Environment Interface
+* The RL problem is meant to be a straightforward framing of the problem of learning from **interaction** to achieve a goal.
+* The learner and decision-maker is called the **agent**.
+* The thing it interacts with, comprising everything outside the agent, is called the **environment**.
+* The agent selecting actions and the environment responding to those actions and presenting new situations to the agent.
 * 
-### 3.1 The Agent–Environment Interface 
 ###  3.2 Goals and Rewards
 ### 3.3 Returns 
 ### 3.4 Unified Notation for Episodic and Continuing Tasks 
@@ -445,7 +451,7 @@ the episode**.
 * However, it turns out that, when we discuss episodic tasks we will almost never have to distinguish between different episodes. We will almost always be considering a particular single episode, or stating something that is true for all episodes.
 * Accordingly, in practice we will almost always abuse notation slightly by dropping the explicit reference to episode number. That is, we will write **S<sub>t</sub>** to refer to **S<sub>t,i</sub>**, and so on.
 * We need one other convention to obtain a single notation that covers both episodic and continuing tasks. We have defined the **return as a sum over a finite number of terms in one case (G<sub>t</sub> = R<sub>t+1</sub> + R<sub>t+2</sub> + R<sub>t+3</sub> + · · · + R<sub>T</sub> )** and as a **sum over an infinite number of terms in the other (G<sub>t</sub> = R<sub>t+1</sub> + γR<sub>t+2</sub> + γ<sup>2</sup>R<sub>t+3</sub> + · · · )**. These can be unified by considering episode termination to be the entering of a special absorbing state that transitions only to itself and that generates only rewards of zero. For example, consider the state transition diagram
-
+![State transition Diagram](<img width="858" alt="Image" src="https://github.com/user-attachments/assets/3b7c6fa0-79a5-415d-a85e-4559d23b4fa6" />)
 ### 3.5 The Markov Property 
 ### 3.6 Markov Decision Processes 
 ### 3.7 Value Functions 
