@@ -611,8 +611,39 @@ generally.
 ## 4 Dynamic Programming 
 * method for solving finite Markov decision problems
 * Dynamic programming methods are well developed mathematically, but **require a complete and accurate model of the environment**.
+* We can easily obtain optimal policies once we have found the optimal value functions, v_{∗} or q_{∗}, which satisfy the Bellman optimality equations:
+
+$$
+\begin{aligned}
+&\begin{aligned}
+v_*(s) & =\max _a \mathbb{E}\left[R_{t+1}+\gamma v_*\left(S_{t+1}\right) \mid S_t=s, A_t=a\right] \\
+& =\max _a \sum_{s^{\prime}, r} p\left(s^{\prime}, r \mid s, a\right)\left[r+\gamma v_*\left(s^{\prime}\right)\right]
+\end{aligned}\\
+&\text { or }\\
+&\begin{aligned}
+q_*(s, a) & =\mathbb{E}\left[R_{t+1}+\gamma \max _{a^{\prime}} q_*\left(S_{t+1}, a^{\prime}\right) \mid S_t=s, A_t=a\right] \\
+& =\sum_{s^{\prime}, r} p\left(s^{\prime}, r \mid s, a\right)\left[r+\gamma \max _{a^{\prime}} q_*\left(s^{\prime}, a^{\prime}\right)\right]
+\end{aligned}
+\end{aligned}
+$$
+
+for all s ∈ S, a ∈ A(s), and s^{'} ∈ S^{+}. 
+* As we shall see, **DP algorithms are obtained** by **turning Bellman equations** such as these into assignments, that is, into update rules for improving approximations of the desired value functions.
 * 
 ### 4.1 Policy Evaluation 
+* First we consider how to compute the state-value function vπ for an arbitrary policy π. This is called policy evaluation in the DP literature. We also refer to it as the prediction problem. Recall from Chapter 3 that, for all s ∈ S,
+
+$$
+\begin{aligned}
+v_\pi(s) & =\mathbb{E}_\pi\left[R_{t+1}+\gamma R_{t+2}+\gamma^2 R_{t+3}+\cdots \mid S_t=s\right] \\
+& =\mathbb{E}_\pi\left[R_{t+1}+\gamma v_\pi\left(S_{t+1}\right) \mid S_t=s\right] \\
+& =\sum_a \pi(a \mid s) \sum_{s^{\prime}, r} p\left(s^{\prime}, r \mid s, a\right)\left[r+\gamma v_\pi\left(s^{\prime}\right)\right]
+\end{aligned}
+$$
+
+where π(a|s) is the probability of taking action a in state s under policy π, and the expectations are subscripted by π to indicate that they are conditional on π being followed. 
+* The existence and uniqueness of vπ are guaranteed as long as either γ < 1 or eventual termination is guaranteed from all states under the policy π.
+* If the environment’s dynamics are completely known, then (4.4) is a system of |S| simultaneous linear equations in |S| unknowns (the vπ(s), s ∈ S). In principle, its solution is a straightforward, if tedious, computation. For our purposes, iterative solution methods are most suitable. Consider a sequence of approximate value functions v_{0}, v_{1}, v_{2}, . . ., each mapping S^{+} to R. The initial approximation, v_{0}, is chosen arbitrarily (except t
 ### 4.2 Policy Improvement 
 ### 4.3 Policy Iteration 
 ### 4.4 Value Iteration 
@@ -632,13 +663,10 @@ generally.
 * It is easy to see that if both the evaluation process and the improvement process stabilize, that is, no longer produce changes, then the value function and policy must be optimal.
 * The value function stabilizes only when it is consistent with the current policy, and the policy stabilizes only when it is greedy with respect to the current value function. Thus, both processes stabilize only when a policy has been found that is greedy with respect to its own evaluation function. This implies that the Bellman optimality equation holds, and
 thus that the policy and the value function are optimal.
-The evaluation and improvement processes in GPI can be viewed as both
-competing and cooperating. They compete in the sense that they pull in opposing directions. Making the policy greedy with respect to the value function
-typically makes the value function incorrect for the changed policy, and making the value function consistent with the policy typically causes that policy no
-longer to be greedy. In the long run, however, these two processes interact to
-find a single joint solution: the optimal value function and an optimal policy.
-One might also think of the interaction between the evaluation and improvement processes in GPI in terms of two constraints or goals—for example,
-as two lines in two-dimensional space
+* The evaluation and improvement processes in GPI can be viewed as both competing and cooperating. They compete in the sense that they pull in opposing directions.
+* Making the policy greedy with respect to the value function typically makes the value function incorrect for the changed policy, and making the value function consistent with the policy typically causes that policy no longer to be greedy.
+* In the long run, however, these two processes interact to find a single joint solution: the optimal value function and an optimal policy.
+* One might also think of the interaction between the evaluation and improvement processes in GPI in terms of two constraints or goals—for example, as two lines in two-dimensional space.
 
 ### 4.7 Efficiency of Dynamic Programming 
 * DP may **not be practical for very large problems**, but **compared with other methods for solving MDP**s, DP methods are actually **quite efficient**.
