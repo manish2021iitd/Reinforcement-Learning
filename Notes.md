@@ -346,11 +346,107 @@ broken randomly. An alternative that has a similar effect is to add a verysmall 
 * The obvious implementation is to maintain  for each action a, a record of all the rewards that have followed the selection of that action.
 *  Then, when the estimate of the value of action a is needed at time t, it can be computed according to (2.1), which we repeat here:
 
+$$
+Q_t(a)=\frac{R_1+R_2+\cdots+R_{N_t(a)}}{N_t(a)}
+$$
+
+   where  $R_1, \ldots, R_{N_t(a)}$ are all the rewards received following all selections of action $a$ prior to play $t$. 
+* A problem with this straightforward implementation is that its memory and computational requirements grow over time without bound. That is, each additional reward following a selection of action $a$ requires more memory to store it and results in more computation being required to determine $Q_t(a)$.
+* As you might suspect, this is not really necessary. It is easy to devise incremental update formulas for computing averages with small, constant computation required to process each new reward. For some action, let $Q_k$ denote the estimate for its $k$ th reward, that is, the average of its first $k-1$ rewards.
+* Given this average and a $k$ th reward for the action, $R_k$, then the average of all $k$ rewards can be computed by
+
+$$
+\begin{aligned}
+Q_{k+1} & =\frac{1}{k} \sum_{i=1}^k R_i \\
+& =\frac{1}{k}\left(R_k+\sum_{i=1}^{k-1} R_i\right) \\
+& =\frac{1}{k}\left(R_k+(k-1) Q_k+Q_k-Q_k\right) \\
+& =\frac{1}{k}\left(R_k+k Q_k-Q_k\right) \\
+& =Q_k+\frac{1}{k}\left[R_k-Q_k\right],
+\end{aligned}
+$$
+
+which holds even for k = 1, obtaining Q2 = R1 for arbitrary Q1. This implementation requires memory only for Q_{k} and k, and only the small computation  for each new reward.
+This update rule is of a form that occurs frequently throughout this study. The general form is
+
+$$
+\text { NewEstimate } \leftarrow \text { OldEstimate }+ \text { StepSize }[\text { Target }- \text { OldEstimate }] .
+$$
+
+
+* The expression **[Target - OldEstimate]** is an **error** in the estimate. It is reduced by taking a step toward the "Target." The target is presumed to indicate a desirable direction in which to move, though it may be noisy.
+* In the case above, for example, the target is the kth reward. Note that the step-size parameter (StepSize) used in the incremental method described above changes from time step to time step. In processing the kth reward for action a, that method uses a step-size parameter of 1/k.
+* In this book we denote the step-size parameter by the symbol α or, more generally, by αt(a). We sometimes use the informal shorthand α =1/k to refer to this case, leaving the dependence of k on the action implicit
 ### 2.4 Tracking a Nonstationary Problem
+* The averaging methods discussed so far are appropriate in a stationary environment, but not if the bandit is changing over time.
+* As noted earlier, we often encounter reinforcement learning problems that are effectively nonstationary. In such cases it makes sense to weight recent rewards more heavily than long-past ones. One of the most popular ways of doing this is to use a constant step-size parameter.
+* For example, the incremental update rule for updating an average Qk of the k − 1 past rewards is modified to be
+
+$$
+Q_{k+1}=Q_k+\alpha\left[R_k-Q_k\right]
+$$
+
+  where the step-size parameter $\alpha \in(0,1]^1$ is constant. This results in $Q_{k+1}$ being a weighted average of past rewards and the initial estimate $Q_1$ :
+
+$$
+\begin{aligned}
+Q_{k+1}= & Q_k+\alpha\left[R_k-Q_k\right] \\
+= & \alpha R_k+(1-\alpha) Q_k \\
+= & \alpha R_k+(1-\alpha)\left[\alpha R_{k-1}+(1-\alpha) Q_{k-1}\right] \\
+= & \alpha R_k+(1-\alpha) \alpha R_{k-1}+(1-\alpha)^2 Q_{k-1} \\
+= & \alpha R_k+(1-\alpha) \alpha R_{k-1}+(1-\alpha)^2 \alpha R_{k-2}+ \\
+& \cdots+(1-\alpha)^{k-1} \alpha R_1+(1-\alpha)^k Q_1 \\
+& =(1-\alpha)^k Q_1+\sum_{i=1}^k \alpha(1-\alpha)^{k-i} R_i .
+\end{aligned}
+$$
+
+* We call this a weighted average because the sum of the weights is $(1-\alpha)^k+$ $\sum_{i=1}^k \alpha(1-\alpha)^{k-i}=1$, as you can check yourself. Note that the weight, $\alpha(1-$ $\alpha)^{k-i}$, given to the reward $R_i$ depends on how many rewards ago, $k-i$, it was observed. The quantity 1 − α is less than 1, and thus the weight given to Ri
+decreases as the number of intervening rewards increases. In fact, the weight decays exponentially according to the exponent on 1 − α. (If 1 − α = 0, then all the weight goes on the very last reward, $R_{k}$, because of the convention that $0^{0} = 1$.) Accordingly, this is sometimes called an exponential, recency-weighted average.
+* Sometimes it is convenient to vary the step-size parameter from step to step. Let αk(a) denote the step-size parameter used to process the reward received after the kth selection of action a. As we have noted, the choice αk(a) = 1/k results in the sample-average method, which is guaranteed to converge to the true action values by the law of large numbers. But of course convergence is not guaranteed for all choices of the sequence {αk(a)}. A wellknown result in stochastic approximation theory gives us the conditions required to assure convergence with probability 1:
+
+$$
+\sum_{k=1}^{\infty} \alpha_k(a)=\infty \quad \text { and } \quad \sum_{k=1}^{\infty} \alpha_k^2(a)<\infty
+$$
+
+The first condition is required to guarantee that the steps are large enough to eventually overcome any initial conditions or random fluctuations. The second condition guarantees that eventually the steps become small enough to assure convergence.
+
+* Note that both convergence conditions are met for the sample-average case, $αk(a) = 1/k$ , but not for the case of constant step-size parameter, $α({k}(a) = α$.
+* In the latter case, the second condition is not met, indicating that the estimates never completely converge but continue to vary in response to the most recently received rewards. As we mentioned above, this is actually desirable in a nonstationary environment, and problems that are effectively nonstationary are the norm in reinforcement learning. In addition, sequences of step-size parameters that meet the conditions (2.7) often converge very slowly or need considerable tuning in order to obtain a satisfactory convergence rate. Although sequences of step-size parameters that meet these convergence conditions are often used in theoretical work, they are seldom used in applications and empirical research.
 ### 2.5 Optimistic Initial Values 
-
+* All the methods we have discussed so far are dependent to some extent on the initial action-value estimates, Q1(a). In the language of statistics, these methods are biased by their initial estimates. For the sample-average methods,
+  
 <img width="794" alt="Image" src="https://github.com/user-attachments/assets/dbe747aa-95a0-4113-b591-b27804f0d728" />
-
+* Figure : The effect of optimistic initial action-value estimates on the 10- armed testbed. Both methods used a constant step-size parameter, α = 0.1.
+* the bias disappears once all actions have been selected at least once, but for
+methods with constant α, the bias is permanent, though decreasing over time
+as given by (2.6). In practice, this kind of bias is usually not a problem, and
+can sometimes be very helpful. The downside is that the initial estimates
+become, in effect, a set of parameters that must be picked by the user, if only
+to set them all to zero. The upside is that they provide an easy way to supply
+some prior knowledge about what level of rewards can be expected.
+Initial action values can also be used as a simple way of encouraging exploration. Suppose that instead of setting the initial action values to zero, as
+we did in the 10-armed testbed, we set them all to +5. Recall that the q(a)
+in this problem are selected from a normal distribution with mean 0 and variance 1. An initial estimate of +5 is thus wildly optimistic. But this optimism
+encourages action-value methods to explore. Whichever actions are initially
+selected, the reward is less than the starting estimates; the learner switches
+to other actions, being “disappointed” with the rewards it is receiving. The
+result is that all actions are tried several times before the value estimates converge. The system does a fair amount of exploration even if greedy actions are
+selected all the time.
+Figure 2.2 shows the performance on the 10-armed bandit testbed of a
+greedy method using Q1(a) = +5, for all a. For comparison, also shown is an
+ε-greedy method with Q1(a) = 0. Initially, the optimistic method performs
+worse because it explores more, but eventually it performs better because its
+exploration decreases with time. We call this technique for encouraging exploration optimistic initial values. We regard it as a simple trick that can be
+quite effective on stationary problems, but it is far from being a generally useful approach to encouraging exploration. For example, it is not well suited to
+nonstationary problems because its drive for exploration is inherently temporary. If the task changes, creating a renewed need for exploration, this method
+cannot help. Indeed, any method that focuses on the initial state in any special
+way is unlikely to help with the general nonstationary case. The beginning
+of time occurs only once, and thus we should not focus on it too much. This
+criticism applies as well to the sample-average methods, which also treat the
+beginning of time as a special event, averaging all subsequent rewards with
+equal weights. Nevertheless, all of these methods are very simple, and one of
+them or some simple combination of them is often adequate in practice. In the
+rest of this book we make frequent use of several of these simple exploration
+techniques.
 ### 2.6 Upper-Confidence-Bound Action Selection
 * Exploration is needed because the estimates of the action values are uncertain.
   * Uncertainty in Action Value Estimates:
