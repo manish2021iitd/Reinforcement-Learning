@@ -447,6 +447,8 @@ equal weights. Nevertheless, all of these methods are very simple, and one of
 them or some simple combination of them is often adequate in practice. In the
 rest of this book we make frequent use of several of these simple exploration
 techniques.
+
+
 ### 2.6 Upper-Confidence-Bound Action Selection
 * Exploration is needed because the estimates of the action values are uncertain.
   * Uncertainty in Action Value Estimates:
