@@ -311,10 +311,11 @@ enable us to see most clearly how evaluative feedback differs from, and yet can 
 * For each bandit, the action values, **q(a), a = 1, . . . , 10**, were selected according to a **normal (Gaussian) distribution with mean 0 and variance 1**.
 * On t-th time step with a given bandit, the actual reward **R<sub>t</sub>** was the **q(A<sub>t</sub>)** for the bandit **(where A<sub>t</sub> was the action selected)** plus a **normally distributed** noise term that was **mean 0** and **variance 1**.
 * Averaging over bandits, we can plot the performance and behavior of various methods as they improve with experience over 1000 steps, as in Figure. We call this suite of test tasks the **10-armed testbed**.
-  
-![Alt Text](images/my-image.png)
 
-![Alt Text](images/my-image.png)
+<img width="1034" alt="Image" src="https://github.com/user-attachments/assets/15f07ebe-5261-4a2c-8286-cd2e7ee8ff3b" />
+
+<img width="1034" alt="Image" src="https://github.com/user-attachments/assets/f83def72-b4ca-4f3d-ba7b-65880ab841af" />
+
 
 * figure: Average performance of ε-greedy action-value methods on the 10-armed testbed. These data are averages over 2000 tasks. All methods used sample averages as their action-value estimates. The detailed structure at the beginning of these curves depends on how actions are selected when multiple actions have the same maximal action value. Here such ties were
 broken randomly. An alternative that has a similar effect is to add a verysmall amount of randomness to each of the initial action values, so that ties effectively never happen.
@@ -347,6 +348,9 @@ broken randomly. An alternative that has a similar effect is to add a verysmall 
 
 ### 2.4 Tracking a Nonstationary Problem
 ### 2.5 Optimistic Initial Values 
+
+<img width="794" alt="Image" src="https://github.com/user-attachments/assets/dbe747aa-95a0-4113-b591-b27804f0d728" />
+
 ### 2.6 Upper-Confidence-Bound Action Selection
 * Exploration is needed because the estimates of the action values are uncertain.
   * Uncertainty in Action Value Estimates:
@@ -371,6 +375,8 @@ A<sub>t</sub> = argmax<sub>a</sub>(Q(a) + c * sqrt(ln(t) / N(a)))
   * The use of the natural logarithm means that the increase gets smaller over time, but is unbounded; all actions will eventually be selected, but as time goes by it will be a longer 
     wait, and thus a lower selection frequency, for actions with a lower value estimate or that have already been selected more times.
 
+<img width="977" alt="Image" src="https://github.com/user-attachments/assets/27bdc6a9-6129-4f0d-9e41-76d2cd1b2e85" />
+
 Figure 2.3: Average performance of UCB action selection on the 10-armed testbed. As shown, UCB generally performs better that ε-greedy action selection, except in the first n plays, when it selects randomly among the as-yet unplayed actions. UCB with c = 1 would perform even better but would not show the prominent spike in performance on the 11th play. Can you think of an explanation of this spike?
 
 * Results with UCB on the 10-armed testbed are shown in Figure 2.3. UCB will often perform well, as shown here, but is more difficult than ε-greedy to extend beyond bandits to the more general reinforcement learning settings considered in the rest of this book.
@@ -385,6 +391,7 @@ Figure 2.3: Average performance of UCB action selection on the 10-armed testbed.
   Only the relative preference of one action over another is important; if we add 1000 to all the preferences there is no affect on the action probabilities, which are determined 
   according to a soft-max distribution (i.e., Gibbs or Boltzmann distribution) as follows:
 
+<img width="913" alt="Image" src="https://github.com/user-attachments/assets/e55204d5-a299-4601-a4a0-5bd98f2b0636" />
 
 ### 2.8 Associative Search (Contextual Bandits)
 * Nonassociative tasks, in which there is no need to associate different actions with different situations. In these tasks the learner either tries to find a single best action when the task is stationary, or tries to track the best action as it changes over time when the task is nonstationary.
@@ -411,8 +418,10 @@ Figure 2.3: Average performance of UCB action selection on the 10-armed testbed.
 * The ε-greedy methods choose randomly a small fraction of the time, whereas UCB methods choose deterministically but achieve exploration by subtly favoring at each step the actions that have so far received fewer samples.
 * Gradient-bandit algorithms estimate not action values, but action preferences, and favor the more preferred actions in a graded, probabalistic manner using a soft-max distribution.
 * The simple expedient of initializing  estimates optimistically causes even greedy methods to explore significantly
-ChatGPT said:
+  
 This idea is called **optimistic initial values**, a simple yet effective technique in reinforcement learning (RL) and multi-armed bandit problems. By initializing action-value estimates Q(a) with high values, the agent is encouraged to explore more in the early stages.
+
+<img width="944" alt="Image" src="https://github.com/user-attachments/assets/f8bb203a-29b7-4dc1-a968-fc549a0a7a15" />
 
 Why Does This Work?
 
