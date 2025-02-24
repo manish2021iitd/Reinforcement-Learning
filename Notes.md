@@ -575,6 +575,15 @@ conventions throughout the rest of the book to simplify notation and to express
 the close parallels between episodic and continuing tasks.
 ### 3.5 The Markov Property 
 ### 3.6 Markov Decision Processes 
+* A reinforcement learning task that satisfies the Markov property is called a Markov decision process, or MDP.
+* If the state and action spaces are finite, then it is called a finite Markov decision process (finite MDP).
+* A particular finite MDP is defined by its state and action sets and by the one-step dynamics of the environment. Given any state and action s and a, the probability of each possible pair of next state and reward, s', r, is denoted
+
+<div align="center">
+\left(s^{\prime}, r \mid s, a\right)=\operatorname{Pr}\left\{S_{t+1}=s^{\prime}, R_{t+1}=r \mid S_t=s, A_t=a\right\} .
+</div>
+
+
 ### 3.7 Value Functions 
 ### 3.8 Optimal Value Functions 
 ### 3.9 Optimality and Approximation 
