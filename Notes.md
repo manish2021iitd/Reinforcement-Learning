@@ -735,8 +735,12 @@ a model but do bootstrap.
 
 ## 6 Temporal-Difference Learning 
 * method for solving finite Markov decision problems
+* TD learning is a combination of Monte Carlo ideas and dynamic programming (DP) ideas
 * Temporal-difference methods require **no model** and are **fully incremental**, but are more **complex** to analyze.
-* methods that do not require a model but do bootstrap.
+* methods that do not require a model but **do bootstrap**.
+* Like Monte Carlo methods, TD methods can learn directly from raw experience without a model of the environment’s dynamics.
+* Like DP, TD methods update estimates based in part on other learned estimates, without waiting for a final outcome (they bootstrap).
+* we start by focusing on the **policy evaluation or prediction problem**, that of estimating the value function v_{π} for a given policy π. For the control problem (finding an optimal policy), DP, TD, and Monte Carlo methods all use **some variation of generalized policy iteration (GPI)**. The differences in the methods are primarily **differences in their approaches** to the prediction problem.
 ### 6.1 TD Prediction 
 ### 6.2 Advantages of TD Prediction Methods 
 ### 6.3 Optimality of TD(0) 
@@ -747,9 +751,24 @@ a model but do bootstrap.
 
 ##### NOTE : DP, MC, TD methods are differ swith respect to their efficiency and speed of convergence.
 
-## 7 Eligibility Traces 
+## 7 Eligibility Traces(λ) 
 * Describe how DP, MC, TD methods can be combined to obtain the best features of each of them.
-* Describe how the strengths of Monte Carlo methods can be combined with the strengths of temporal-difference methods via the use of eligibility traces. 
+* Describe how the strengths of Monte Carlo methods can be combined with the strengths of temporal-difference methods via the use of eligibility traces.
+* TD(λ) algorithm, which seamlessly integrates TD and Monte Carlo methods.
+* Eligibility traces are one of the basic mechanisms of reinforcement learning. For example, in the popular TD(λ) algorithm, the **λ refers to the use of an
+eligibility trace**. Almost **any temporal-difference (TD) method, such as Qlearning or Sarsa, can be combined with eligibility traces** to obtain a more general method that may learn more efficiently.
+* There are two ways to view eligibility traces.
+  * One way is,they are a bridge from TD to Monte Carlo methods. When TD methods are augmented with eligibility traces, they produce a family of methods spanning a spectrum that has 
+    Monte Carlo methods at one end and one-step TD methods at the other.In between are intermediate methods that are often better than either extreme method. In this sense eligibility 
+    traces unify TD and Monte Carlo methods in a valuable and revealing way.
+  * The other way to view eligibility traces is more mechanistic. From this perspective, an eligibility trace is a temporary record of the occurrence of an event, such as the visiting 
+    of a state or the taking of an action. The trace marks the memory parameters associated with the event as eligible for undergoing learning changes. When a TD error occurs, only 
+    the eligible states or actions are assigned credit or blame for the error. Thus, eligibility traces help bridge the gap between events and training information. Like TD methods 
+    themselves, eligibility traces are a basic mechanism for temporal credit assignment.
+* For reasons that will become apparent shortly, the more theoretical view of eligibility traces is called **the forward view**, and the more mechanistic view is called the **backward view**.
+* The forward view is most useful for understanding what is computed by methods using eligibility traces, whereas the backward view is more appropriate for developing intuition about the algorithms them selves.
+* We will see both views and then establish senses in which they are equivalent, that is, in which they describe the same algorithms from two points of view. As usual, we first consider the prediction problem and then the control problem. That is, we first consider **how eligibility traces are used to help in predicting returns as a function of state for a fixed policy** (i.e., in estimating v_{π}). Only after exploring the two views of eligibility traces within this prediction setting do we extend the ideas to action valuesand control 
+ methods.
 ### 7.1 n-Step TD Prediction
 ### 7.2 The Forward View of TD(λ) 
 ### 7.3 The Backward View of TD(λ) 
