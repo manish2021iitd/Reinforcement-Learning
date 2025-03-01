@@ -742,6 +742,27 @@ a model but do bootstrap.
 * Like DP, TD methods update estimates based in part on other learned estimates, without waiting for a final outcome (they bootstrap).
 * we start by focusing on the **policy evaluation or prediction problem**, that of estimating the value function v_{π} for a given policy π. For the control problem (finding an optimal policy), DP, TD, and Monte Carlo methods all use **some variation of generalized policy iteration (GPI)**. The differences in the methods are primarily **differences in their approaches** to the prediction problem.
 ### 6.1 TD Prediction 
+* As Both TD and Monte Carlo methods use experience to solve the prediction problem.
+* Given some experience following a policy π, both methods updatetheir estimate v of v_{π} for the nonterminal states S_{t} occurring in that experience.
+* Roughly speaking, Monte Carlo methods wait until the return following the visit is known, then use that return as a target for V (S_{t}).
+* A simple every-visit Monte Carlo method suitable for nonstationary environments is
+
+$$
+\begin{equation}
+V\left(S_t\right) \leftarrow V\left(S_t\right)+\alpha\left[G_t-V\left(S_t\right)\right]
+\end{equation}
+$$
+
+where $G_t$ is the actual return following time $t$, and \alpha$ is a constant stepsize parameter .
+
+  Let us call this method constant-$\alpha$ MC. 
+  
+  Whereas Monte Carlo methods must wait until the end of the episode to determine the increment to $V\left(S_t\right)$ (only then is $G_t$ known), TD methods need wait only until the 
+  next time step. 
+  
+  At time $t+1$ they immediately form a target and make a useful update using the observed reward $R_{t+1}$ and the estimate $V\left(S_{t+1}\right)$. 
+
+The simplest TD method, known as $T D(0)$, is
 ### 6.2 Advantages of TD Prediction Methods 
 ### 6.3 Optimality of TD(0) 
 ### 6.4 Sarsa: On-Policy TD Control 
